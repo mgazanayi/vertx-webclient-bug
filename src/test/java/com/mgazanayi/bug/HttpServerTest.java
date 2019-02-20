@@ -6,12 +6,13 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.ext.web.client.WebClient;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(VertxUnitRunner.class)
 public class HttpServerTest {
@@ -23,7 +24,7 @@ public class HttpServerTest {
    @Before
    public final void init(TestContext context) {
       vertx = Vertx.vertx();
-      webClient = WebClient.wrap(vertx.createHttpClient());
+      webClient = WebClient.create(vertx);
       httpServer = new HttpServer();
       vertx.deployVerticle(httpServer, new DeploymentOptions(), context.asyncAssertSuccess());
    }

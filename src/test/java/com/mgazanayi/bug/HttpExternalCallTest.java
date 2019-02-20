@@ -22,7 +22,7 @@ public class HttpExternalCallTest {
    @Before
    public final void init(TestContext context) {
       vertx = Vertx.vertx();
-      webClient = WebClient.wrap(vertx.createHttpClient());
+      webClient = WebClient.create(vertx);
    }
 
    @After
