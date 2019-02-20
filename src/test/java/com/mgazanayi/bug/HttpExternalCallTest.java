@@ -21,8 +21,11 @@ public class HttpExternalCallTest {
 
    @Before
    public final void init(TestContext context) {
+      Async async = context.async();
       vertx = Vertx.vertx();
       webClient = WebClient.create(vertx);
+
+      async.complete();
    }
 
    @After
