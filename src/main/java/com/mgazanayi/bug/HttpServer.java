@@ -1,5 +1,6 @@
 package com.mgazanayi.bug;
 
+import io.vertx.core.Future;
 import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.ext.web.Router;
 import io.vertx.reactivex.ext.web.RoutingContext;
@@ -8,7 +9,7 @@ import io.vertx.reactivex.ext.web.handler.BodyHandler;
 public class HttpServer extends AbstractVerticle {
 
    @Override
-   public void start() {
+   public void start(Future<Void> startFuture) {
       var router = Router.router(vertx);
       router.route().handler(BodyHandler.create());
 
@@ -16,7 +17,9 @@ public class HttpServer extends AbstractVerticle {
 
       vertx.createHttpServer()
             .requestHandler(router)
-            .listen(config().getInteger("bug.server.port", 9000));
+            .listen(config().getInteger("bug.server.port", 9000), lh -> {
+               startFuture.complete();
+            });
    }
 
    private void getHandler(RoutingContext rc) {
