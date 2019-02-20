@@ -6,12 +6,12 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.ext.web.client.WebClient;
-
-import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(VertxUnitRunner.class)
 public class HttpServerTest {
@@ -34,13 +34,38 @@ public class HttpServerTest {
    }
 
    @Test
-   public void should_call_vertx_http_server(TestContext testContext) {
+   public void should_call_vertx_http_server_1(TestContext testContext) {
       Async async = testContext.async();
 
       webClient.get(9000, "localhost", "/api/dummy")
-            .send(feed -> {
-               Assertions.assertThat(feed.result().bodyAsString()).isEqualTo("{\"response\" : \"Working if test launched alone\"}");
+            .send(feed -> testContext.verify(h -> {
+               assertThat(feed.succeeded()).withFailMessage(feed.toString(), feed.cause()).isTrue();
+               assertThat(feed.result().bodyAsString()).isEqualTo("{\"response\" : \"Working if test launched alone\"}");
                async.complete();
-            });
+            }));
+   }
+
+   @Test
+   public void should_call_vertx_http_server_2(TestContext testContext) {
+      Async async = testContext.async();
+
+      webClient.get(9000, "localhost", "/api/dummy")
+            .send(feed -> testContext.verify(h -> {
+               assertThat(feed.succeeded()).withFailMessage(feed.toString(), feed.cause()).isTrue();
+               assertThat(feed.result().bodyAsString()).isEqualTo("{\"response\" : \"Working if test launched alone\"}");
+               async.complete();
+            }));
+   }
+
+   @Test
+   public void should_call_vertx_http_server_3(TestContext testContext) {
+      Async async = testContext.async();
+
+      webClient.get(9000, "localhost", "/api/dummy")
+            .send(feed -> testContext.verify(h -> {
+               assertThat(feed.succeeded()).withFailMessage(feed.toString(), feed.cause()).isTrue();
+               assertThat(feed.result().bodyAsString()).isEqualTo("{\"response\" : \"Working if test launched alone\"}");
+               async.complete();
+            }));
    }
 }
