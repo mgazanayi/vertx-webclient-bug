@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <groupId>com.mgazanayi</groupId>
+   <artifactId>vertx-webclient-bug</artifactId>
+   <version>0.1</version>
+
+   <name>vertx-webclient-bug</name>
+
+   <properties>
+      <!-- the main class -->
+      <exec.mainVerticle>com.mgazanayi.bug.Deployer</exec.mainVerticle>
+      <exec.mainClass>com.mgazanayi.bug.Application</exec.mainClass>
+      <maven.compiler.source>11</maven.compiler.source>
+      <maven.compiler.target>11</maven.compiler.target>
+   </properties>
+
+   <dependencyManagement>
+      <dependencies>
+         <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-stack-depchain</artifactId>
+            <version>3.6.2</version>
+            <scope>import</scope>
+            <type>pom</type>
+         </dependency>
+      </dependencies>
+   </dependencyManagement>
+
+   <dependencies>
+
+      <dependency>
+         <groupId>io.vertx</groupId>
+         <artifactId>vertx-core</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>io.vertx</groupId>
+         <artifactId>vertx-web</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>io.vertx</groupId>
+         <artifactId>vertx-web-client</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>io.vertx</groupId>
+         <artifactId>vertx-rx-java2</artifactId>
+      </dependency>
+
+      <!-- TESTS -->
+
+      <dependency>
+         <groupId>io.vertx</groupId>
+         <artifactId>vertx-unit</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <!-- Needed to prevent NPE when trying to mock Vert.x interfaces with Mockito -->
+      <!-- https://github.com/mockito/mockito/issues/366 -->
+      <dependency>
+         <groupId>io.vertx</groupId>
+         <artifactId>vertx-codegen</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <version>4.12</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.assertj</groupId>
+         <artifactId>assertj-core</artifactId>
+         <version>3.11.1</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>com.github.tomakehurst</groupId>
+         <artifactId>wiremock</artifactId>
+         <version>2.21.0</version>
+      </dependency>
+   </dependencies>
+
+   <build>
+      <pluginManagement>
+         <plugins>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+         </plugins>
+      </pluginManagement>
+
+      <plugins>
+         <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+               <useSystemClassLoader>false</useSystemClassLoader>
+            </configuration>
+         </plugin>
+         <plugin>
+            <artifactId>maven-toolchains-plugin</artifactId>
+         </plugin>
+         <!-- We use maven-shade-plugin instead of maven vertx plugin because we need to append META-INF/kie.conf files -->
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <executions>
+               <execution>
+                  <phase>package</phase>
+                  <goals>
+                     <goal>shade</goal>
+                  </goals>
+                  <configuration>
+                     <transformers>
+                        <transformer
+                              implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                           <manifestEntries>
+                              <Main-Class>${exec.mainClass}</Main-Class>
+                              <Main-Verticle>${exec.mainVerticle}</Main-Verticle>
+                           </manifestEntries>
+                        </transformer>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                           <resource>META-INF/services/io.vertx.core.spi.VerticleFactory</resource>
+                        </transformer>
+                     </transformers>
+                     <artifactSet>
+                     </artifactSet>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+         <plugin>
+            <groupId>io.reactiverse</groupId>
+            <artifactId>vertx-maven-plugin</artifactId>
+            <version>1.0.18</version>
+            <configuration>
+               <config>src/main/resources/conf.json</config>
+               <verticle>${exec.mainVerticle}</verticle>
+               <redeploy>true</redeploy>
+               <launcher>${exec.mainClass}</launcher>
+            </configuration>
+            <executions>
+               <execution>
+                  <id>vertx-init</id>
+                  <goals>
+                     <goal>initialize</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
+
+</project>
