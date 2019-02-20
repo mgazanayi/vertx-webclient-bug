@@ -97,6 +97,14 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
                <useSystemClassLoader>false</useSystemClassLoader>
+               
+               <!--
+                 It might be possible the bug depends on the test execution order.
+                 Test should not depend on execution order, but we can't figure
+                 out what causes the order dependency, so run the tests in alphabetical
+                 order to increase the chances of reproducing the issue.
+              -->
+               <runOrder>alphabetical</runOrder>
             </configuration>
          </plugin>
          <plugin>
